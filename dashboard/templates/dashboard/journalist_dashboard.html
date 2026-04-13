@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Journalist Dashboard</h2>
+<p>Welcome Journalist ✍️</p>
+
+<a href="{% url 'news:create_news' %}" class="btn btn-primary mt-3">
+    Create News
+</a>
+
+{% endblock %}

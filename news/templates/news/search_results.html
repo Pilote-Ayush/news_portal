@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>Search Results for "{{ query }}"</h3>
+
+    <hr>
+
+    {% for news in results %}
+
+    <div class="card p-3 mb-3">
+
+        <h4>{{ news.title }}</h4>
+
+        <p>{{ news.content|truncatewords:20 }}</p>
+
+        <a href="{% url 'news:news_detail' news.id %}" class="btn btn-primary">
+            Read News
+        </a>
+
+    </div>
+
+    {% empty %}
+
+    <p>No news found.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

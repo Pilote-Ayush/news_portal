@@ -1,0 +1,21 @@
+<h2>🔖 Saved News</h2>
+
+{% for bookmark in bookmarks %}
+
+<div class="card p-3 mb-2">
+
+<h4>{{ bookmark.news.title }}</h4>
+
+<p>{{ bookmark.news.content|truncatewords:20 }}</p>
+
+<a href="{% url 'news:news_detail' bookmark.news.id %}" class="btn btn-primary">
+Read
+</a>
+
+</div>
+
+{% empty %}
+
+<p>No saved news</p>
+
+{% endfor %}

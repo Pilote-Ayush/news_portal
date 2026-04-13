@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg p-4">
+
+        {% if news.image %}
+        <img src="{{ news.image.url }}" class="img-fluid mb-4" style="border-radius:10px;">
+        {% endif %}
+
+        {% if user == news.author  or user.is_superuser %}
+        <a href="{% url 'news:edit_news' news.id %}" class="btn btn-warning mt-3">Edit</a>
+        <a href="{% url 'news:delete_news' news.id %}" class="btn btn-danger mt-3">Delete</a>
+        {% endif %}
+
+        {% if news.is_approved %}
+        <span class="badge bg-success">Approved</span>
+        {% else %}
+        <span class="badge bg-secondary">Pending approval</span>
+        {% if user.is_superuser %}
+        <a href="{% url 'approve_news' news.id %}" class="btn btn-sm btn-success mt-2">Approve</a>
+        {% endif %}
+        {% endif %}
+
+        <h2 class="mb-3">{{ news.title }}</h2>
+
+        <p class="text-muted">
+            Category: {{ news.category.name }} |
+            Author: <a href="{% url 'accounts:profile' news.author.username %}">{{ news.author.username }}</a> |
+            Published: {{ news.created_at|date:"F d, Y" }} |
+            👁 {{ news.views }} Views |
+            ⏱️ {{ news.get_reading_time }} min read
+        </p>
+
+        {% if news.tags.all %}
+        <p class="text-muted">
+            Tags: {% for tag in news.tags.all %}<span class="badge bg-secondary">{{ tag.name }}</span> {% endfor %}
+        </p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+
+        <a href="{% url 'news:like_news' news.id %}" class="btn btn-primary">
+            ❤️ Like
+        </a>
+
+        {% else %}
+
+        <a href="/accounts/login/" class="btn btn-primary">
+            Login to Like
+        </a>
+
+        {% endif %}
+
+        <a href="{% url 'news:bookmark_news' news.id %}" class="btn btn-warning mt-2">
+            🔖 Bookmark
+        </a>
+
+        <hr>
+
+        <h5>📤 Share this News</h5>
+
+        <a target="_blank" href="https://api.whatsapp.com/send?text={{ request.build_absolute_uri }}"
+            class="btn btn-success">
+            WhatsApp
+        </a>
+
+        <a target="_blank" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}"
+            class="btn btn-info">
+            Twitter
+        </a>
+
+        <input type="text" value="{{ request.build_absolute_uri }}" id="newsLink" hidden>
+
+        <button onclick="copyLink()" class="btn btn-secondary">
+            Copy Link
+        </button>
+
+        <hr>
+
+        <p style="font-size:18px; line-height:1.8;">
+            {{ news.content }}
+        </p>
+
+        <hr>
+
+        <h4>💬 Comments</h4>
+
+        {% for comment in news.comments.all %}
+
+        {% if not comment.parent %}
+
+        <div class="card p-2 mb-2">
+
+            <b>{{ comment.user.email }}</b>
+
+            <p>{{ comment.text }}</p>
+
+            <small>{{ comment.created_at|date:"F d, Y H:i" }}</small>
+
+            <!-- Reply Form -->
+            {% if user.is_authenticated %}
+
+            <form method="POST" action="{% url 'news:add_comment' news.id %}">
+
+                {% csrf_token %}
+
+                <textarea name="text" class="form-control" placeholder="Write your comment..." required></textarea>
+
+                <br>
+
+                <button class="btn btn-danger">Post Comment</button>
+
+            </form>
+
+            {% else %}
+
+            <p>
+                Please <a href="/accounts/login/">login</a> to comment.
+            </p>
+
+            {% endif %}
+            {% if user == comment.user or user.is_superuser %}
+            <a href="{% url 'news:delete_comment' comment.id %}" class="btn btn-sm btn-danger mt-1">
+                Delete
+            </a>
+            {% endif %}
+
+        </div>
+
+        <!-- Replies -->
+        {% for reply in comment.replies.all %}
+
+        <div class="card p-2 mb-2 ms-5">
+
+            <b>{{ reply.user.email }}</b>
+
+            <p>{{ reply.text }}</p>
+
+            <small>{{ reply.created_at|date:"F d, Y H:i" }}</small>
+
+        </div>
+
+        {% endfor %}
+
+        {% endif %}
+
+        {% empty %}
+
+        <p>No comments yet.</p>
+
+        {% endfor %}
+
+        <h5 class="mt-4">Add Comment</h5>
+
+
+        <form method="POST" action="{% url 'news:add_comment' news.id %}">
+
+            {% csrf_token %}
+
+            <textarea name="text" class="form-control" placeholder="Write your comment..." required></textarea>
+
+            <br>
+
+            <button class="btn btn-danger">Post Comment</button>
+
+        </form>
+
+
+
+        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+
+        {% if related_articles %}
+        <hr>
+        <h4>📚 Related Articles</h4>
+        <div class="row">
+            {% for related in related_articles %}
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    {% if related.image %}
+                    <img src="{{ related.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a href="{% url 'news:news_detail' related.id %}" class="text-decoration-none">{{ related.title }}</a>
+                        </h6>
+                        <p class="card-text text-muted small">
+                            By {{ related.author.username }} | {{ related.created_at|date:"M d, Y" }}
+                        </p>
+                        {% if related.tags.all %}
+                        <p class="card-text">
+                            {% for tag in related.tags.all %}
+                            <span class="badge bg-secondary">{{ tag.name }}</span>
+                            {% endfor %}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function copyLink() {
+
+        navigator.clipboard.writeText(window.location.href)
+
+            .then(function () {
+                alert("✅ Link copied successfully!");
+            })
+
+            .catch(function () {
+                alert("❌ Failed to copy link");
+            });
+
+    }
+
+</script>
+
+
+{% endblock %}

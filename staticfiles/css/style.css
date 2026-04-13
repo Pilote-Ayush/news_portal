@@ -1,0 +1,127 @@
+/* Global */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #0d1b2a !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+
+/* Card Design */
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Buttons */
+.btn-dark {
+    background-color: #1b263b;
+    border: none;
+}
+
+.btn-dark:hover {
+    background-color: #415a77;
+}
+
+.btn-primary {
+    background-color: #1d3557;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #457b9d;
+}
+
+/* Dashboard Titles */
+h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* News Form */
+form input, form textarea, form select {
+    border-radius: 8px !important;
+}
+
+/* Footer */
+.footer {
+    background-color: #0d1b2a;
+    color: white;
+    padding: 20px;
+    margin-top: 50px;
+    text-align: center;
+}
+
+/* Background for Create News */
+.news-bg {
+    background: linear-gradient(rgba(13,27,42,0.8), rgba(13,27,42,0.8)),
+    url("https://images.unsplash.com/photo-1504711434969-e33886168f5c");
+    background-size: cover;
+    background-position: center;
+    padding: 80px 0;
+    min-height: 100vh;
+}
+
+/* News Form Card */
+.news-card {
+    background: white;
+    max-width: 600px;
+    margin: auto;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Inputs Styling */
+.news-card input,
+.news-card textarea,
+.news-card select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Submit Button */
+.btn-submit {
+    background-color: #1d3557;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px;
+    transition: 0.3s ease;
+}
+
+.btn-submit:hover {
+    background-color: #457b9d;
+}
+
+
+/* Homepage News Hover Effect */
+.news-card-hover {
+    transition: 0.3s ease;
+}
+
+.news-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 10px 25px rgba(0,0,0,0.2);
+}
+
+.card img {
+    max-height: 400px;
+    object-fit: cover;
+}

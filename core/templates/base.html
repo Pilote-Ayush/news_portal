@@ -1,0 +1,450 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <title>City State News Portal</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --navbar-bg: #343a40;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --link-color: #007bff;
+            --btn-primary-bg: #007bff;
+            --btn-secondary-bg: #6c757d;
+            --hero-bg: rgba(0, 0, 0, 0.6);
+            --breaking-bg: #ff0000;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --navbar-bg: #1a1a1a;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+            --link-color: #4dabf7;
+            --btn-primary-bg: #0056b3;
+            --btn-secondary-bg: #545b62;
+            --hero-bg: rgba(0, 0, 0, 0.8);
+            --breaking-bg: #cc0000;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .navbar {
+            background-color: var(--navbar-bg) !important;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .card-body {
+            color: var(--text-color);
+        }
+
+        .text-muted {
+            color: var(--text-color) !important;
+            opacity: 0.6;
+        }
+
+        a {
+            color: var(--link-color);
+        }
+
+        .btn-primary {
+            background-color: var(--btn-primary-bg);
+            border-color: var(--btn-primary-bg);
+        }
+
+        .btn-secondary {
+            background-color: var(--btn-secondary-bg);
+            border-color: var(--btn-secondary-bg);
+        }
+
+        .form-control {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        .form-control:focus {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .hero {
+            background: linear-gradient(var(--hero-bg), var(--hero-bg)), url('/static/newsbg.jpg');
+        }
+
+        .breaking-news {
+            background-color: var(--breaking-bg);
+        }
+
+        /* Additional Styles */
+        .sidebar {
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar .card {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar .card-header {
+            font-weight: bold;
+        }
+
+        .breadcrumb {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+        }
+
+        .breadcrumb-item a {
+            color: var(--link-color);
+        }
+
+        /* Back to Top Button */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background-color: var(--btn-primary-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        #back-to-top:hover {
+            background-color: var(--btn-secondary-bg);
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Footer Styles */
+        footer h5 {
+            color: #fff;
+            border-bottom: 2px solid #fff;
+            padding-bottom: 10px;
+        }
+
+        footer a:hover {
+            color: #ccc !important;
+        }
+
+        footer .input-group .form-control {
+            border-radius: 0.375rem 0 0 0.375rem;
+        }
+
+        footer .input-group .btn {
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">City State News</a>
+            <form method="GET" action="{% url 'news:search_news' %}" class="d-flex">
+
+                <input class="form-control me-2" type="search" name="q" placeholder="Search news">
+
+                <button class="btn btn-outline-light">
+                    Search
+                </button>
+
+            </form>
+
+
+            <div>
+                <button id="theme-toggle" class="btn btn-sm btn-outline-light me-2">🌙 Dark</button>
+                {% if user.is_authenticated %}
+                <a class="btn btn-sm btn-outline-light me-2" href="{% url 'news:notifications' %}">
+                    🔔 Notifications
+                    {% if unread_notifications > 0 %}
+                    <span class="badge bg-danger">{{ unread_notifications }}</span>
+                    {% endif %}
+                </a>
+                <a class="btn btn-sm btn-outline-light me-2" href="{% url 'accounts:profile' user.username %}">👤
+                    Profile</a>
+                <span class="text-white me-3">
+                    Welcome, {{ user.username }}
+                </span>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm">Logout</a>
+                {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-light btn-sm me-2">Login</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-warning btn-sm">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8 col-md-12">
+                <!-- Breadcrumbs -->
+                {% block breadcrumbs %}
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                        {% block breadcrumb_items %}{% endblock %}
+                    </ol>
+                </nav>
+                {% endblock %}
+
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4 col-md-12">
+                <div class="sidebar">
+                    {% block sidebar %}
+                    <!-- Trending News -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">🔥 Trending News</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for news in trending_news|slice:":5" %}
+                            <div class="d-flex mb-3">
+                                {% if news.image %}
+                                <img src="{{ news.image.url }}" alt="{{ news.title }}" class="me-3"
+                                    style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                {% else %}
+                                <img src="https://via.placeholder.com/60x60?text=No+Image" alt="No image" class="me-3"
+                                    style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">
+                                        <a href="{% url 'news:news_detail' news.id %}" class="text-decoration-none">
+                                            {{news.title|truncatechars:50 }}
+                                            {{ news.created_at }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">{{ news.created_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted">No trending news available</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">📂 Categories</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'home' %}" class="btn btn-outline-primary btn-sm">All News</a>
+                                <a href="{% url 'home' %}?category=Politics"
+                                    class="btn btn-outline-secondary btn-sm">Politics</a>
+                                <a href="{% url 'home' %}?category=Sports"
+                                    class="btn btn-outline-secondary btn-sm">Sports</a>
+                                <a href="{% url 'home' %}?category=Technology"
+                                    class="btn btn-outline-secondary btn-sm">Technology</a>
+                                <a href="{% url 'home' %}?category=Business"
+                                    class="btn btn-outline-secondary btn-sm">Business</a>
+                                <a href="{% url 'home' %}?category=Entertainment"
+                                    class="btn btn-outline-secondary btn-sm">Entertainment</a>
+                                <a href="{% url 'home' %}?category=Health"
+                                    class="btn btn-outline-secondary btn-sm">Health</a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Recent Comments -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">💬 Recent Comments</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_comments %}
+                            {% for comment in recent_comments %}
+                            <div class="mb-3">
+                                <strong>{{ comment.user.username }}</strong> on
+                                <a href="{% url 'news:news_detail' comment.news.id %}" class="text-decoration-none">
+                                    {{ comment.news.title|truncatechars:30 }}
+                                </a>
+                                <p class="mb-1 small text-muted">{{ comment.text|truncatechars:50 }}</p>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-muted">No comments yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="bg-dark text-light mt-5 py-5">
+        <div class="container">
+            <div class="row">
+                <!-- About Section -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">City State News</h5>
+                    <p class="mb-3">Your trusted source for local and global news. Stay informed with the latest updates
+                        from your city and state.</p>
+                    <div class="d-flex mb-3">
+                        <small>Email: <a href="mailto:ayushpra006@gmail.com"
+                                class="text-light">ayushpra006@gmail.com</a></small>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <small>Phone: <a href="tel:+919426346182" class="text-light">+91 94263 46182</a></small>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <small>Address: Gujarat, India</small>
+                    </div>
+                    <div class="d-flex">
+                        <a href="https://www.facebook.com" target="_blank" class="text-light me-3 fs-5"
+                            title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://twitter.com" target="_blank" class="text-light me-3 fs-5" title="Twitter"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="text-light me-3 fs-5"
+                            title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://linkedin.com" target="_blank" class="text-light me-3 fs-5" title="LinkedIn"><i
+                                class="fab fa-linkedin"></i></a>
+                        <a href="https://www.youtube.com" target="_blank" class="text-light fs-5" title="YouTube"><i
+                                class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <!-- Quick Links -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'news:search_news' %}" class="text-decoration-none">Search
+                                News</a></li>
+                        <li class="mb-2"><a href="{% url 'accounts:register' %}" class="text-decoration-none">Join
+                                as Journalist</a></li>
+                        {% if user.is_authenticated %}
+                        <li class="mb-2"><a href="{% url 'accounts:profile' user.username %}"
+                                class="text-decoration-none">My Profile</a></li>
+                        <li class="mb-2"><a href="{% url 'accounts:logout' %}" class="text-decoration-none">Logout</a>
+                        </li>
+                        {% else %}
+                        <li class="mb-2"><a href="{% url 'accounts:login' %}" class="text-decoration-none">Login</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Categories</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}?category=Politics"
+                                class="text-decoration-none">Politics</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}?category=Sports"
+                                class="text-decoration-none">Sports</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}?category=Technology"
+                                class="text-decoration-none">Technology</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}?category=Business"
+                                class="text-decoration-none">Business</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}?category=Entertainment"
+                                class="text-decoration-none">Entertainment</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}?category=Health"
+                                class="text-decoration-none">Health</a></li>
+                    </ul>
+                </div>
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>Contact Info</h6>
+                    <p class="mb-1"><i class="fas fa-envelope me-2"></i> info@citystatenews.com</p>
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i> +91 9426346182</p>
+                    <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i> Modasa, Gujarat, India</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Bottom Bar -->
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2026 City State News Portal. All rights reserved by Ayush Prajapati</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-decoration-none me-3">Terms of Service</a>
+                <a href="#" class="text-decoration-none">Sitemap</a>
+            </div>
+        </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" title="Back to Top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Load theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
+
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            themeToggle.textContent = newTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
+        });
+
+        // Back to Top functionality
+        const backToTopBtn = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+
+</body>
+
+</html>
